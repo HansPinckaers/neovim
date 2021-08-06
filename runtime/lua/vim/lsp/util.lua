@@ -954,6 +954,8 @@ function M.make_floating_popup_options(width, height, opts)
   validate {
     ["opts.offset_x"] = { opts.offset_x, 'n', true };
     ["opts.offset_y"] = { opts.offset_y, 'n', true };
+    ["opts.prefer_top"] = { opts.prefer_top, 'b', true };
+    ["opts.prefer_bottom"] = { opts.prefer_bottom, 'b', true };
   }
 
   local anchor = ''
@@ -962,7 +964,13 @@ function M.make_floating_popup_options(width, height, opts)
   local lines_above = vim.fn.winline() - 1
   local lines_below = vim.fn.winheight(0) - lines_above
 
-  if lines_above < lines_below then
+  if opts.prefer_top and lines_above >= height then
+    anchor = anchor..'S'
+    row = -get_border_size(opts).height
+  elseif opts.prefer_bottom and lines_below >= height then
+    anchor = anchor..'N'
+    row = 1
+  elseif lines_above < lines_below then
     anchor = anchor..'N'
     height = math.min(lines_below, height)
     row = 1
